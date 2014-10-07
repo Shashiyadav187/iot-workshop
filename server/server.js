@@ -1,9 +1,13 @@
 var Primus        = require('primus'),
     PrimusEmitter = require('primus-emitter'),
+    EventEmitter  = require('events').EventEmitter,
     express       = require('express'),
     mqtt          = require('mqtt'),
     http          = require('http'),
     path          = require('path');
+
+// Events
+var events = new EventEmitter();
 
 // Express
 var app = express();
@@ -19,7 +23,7 @@ primus.use('emitter', PrimusEmitter);
 primus.on('connection', function (socket) {
 
   socket.on('color', function (color) {
-    console.log(color);
+    events.emit('mqtt:broadcast', 'colors', color);
   });
 });
 
@@ -60,12 +64,20 @@ var mqttServer = mqtt.createServer(function (client) {
     console.log(client.id + ' disconnected');
   });
 
-
   client.on('error', function (packet) {
     if (!clients[client.id]) return;
 
     delete clients[client.id];
     client.stream.end();
+  });
+
+  // Event Handlers
+  events.on('mqtt:broadcast', function (topic, payload) {
+    var clientIds = Object.keys(clients);
+
+    clientIds.forEach(function (id) {
+      clients[id].publish({ topic: topic, payload: payload });
+    });
   });
 
 });
