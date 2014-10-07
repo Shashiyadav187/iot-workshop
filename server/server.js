@@ -39,6 +39,17 @@ var mqttServer = mqtt.createServer(function (client) {
     client.pingresp();
   });
 
+  client.on('subscribe', function (packet) {
+    var granted = [];
+
+    for (var i = 0; i < packet.subscriptions.length; i++) {
+      granted.push(packet.subscriptions[i].qos);
+    }
+
+    client.suback({ granted: granted, messageId: packet.messageId });
+    console.log(client.id + ' subscribed');
+  });
+
   client.on('close', function (packet) {
     delete clients[client.id];
     console.log(client.id + ' closed connection');
