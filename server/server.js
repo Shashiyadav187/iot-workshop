@@ -16,7 +16,10 @@ var primus = new Primus(server);
 primus.use('emitter', PrimusEmitter);
 
 primus.on('connection', function (socket) {
-  console.log(socket);
+
+  socket.on('color', function (color) {
+    console.log(color);
+  });
 });
 
 // Servers

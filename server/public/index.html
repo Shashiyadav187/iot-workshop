@@ -7,8 +7,18 @@
 </head>
 <body>
   <h1>Realtime Example for IoT</h1>
+  <input type="color">
   <script>
+    var colorInput = document.querySelector('input[type=color]');
     var socket = Primus.connect();
+
+
+    colorInput.onchange = function () {
+      var color = this.value;
+
+      socket.send('color', color);
+    };
+
   </script>
 </body>
 </html>
