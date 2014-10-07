@@ -12,9 +12,20 @@ var board = new five.Board({
 board.on('ready', function () {
   var client = mqtt.createClient();
 
+  var led = new five.Led.RGB({
+    pins: {
+      red: 'A5',
+      green: 'A6',
+      blue: 'A7'
+    }
+  });
+
   client.subscribe('colors');
 
   client.on('message', function (topic, payload) {
-    console.log(topic, payload);
+    if (topic === 'colors') {
+      var color = payload;
+      led.color(color);
+    }
   });
 });
